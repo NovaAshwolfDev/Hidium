@@ -4,6 +4,34 @@
 #include "../../FortniteGame/Public/BattleRoyaleGamePhaseLogic.h"
 #include <thread>
 
+static void EventLog(const char* Message)
+{
+    FILE* File = nullptr;
+
+    if (fopen_s(&File, "HidiumEvents.log", "a") == 0 && File)
+    {
+        fprintf(File, "%s\n", Message);
+        fclose(File);
+    }
+
+    printf("%s\n", Message);
+}
+
+static void EventLog(const char* Message, const wchar_t* Value)
+{
+    FILE* File = nullptr;
+
+    if (fopen_s(&File, "HidiumEvents.log", "a") == 0 && File)
+    {
+        fprintf(File, "%s", Message);
+        fwprintf(File, L"%ls\n", Value);
+        fclose(File);
+    }
+
+    printf("%s", Message);
+    wprintf(L"%ls\n", Value);
+}
+
 struct FPhaseDataLayerEntry
 {
 public:
@@ -70,7 +98,7 @@ void Events::LoadEvent()
         //edge case 1. - milo
         if(!ScriptingObject)
         {
-            printf("[Events] Failed to find ScriptingObject for loader!\n");
+            EventLog("[Events] Failed to find ScriptingObject for loader!");
             return;
         }
         
@@ -79,16 +107,16 @@ void Events::LoadEvent()
         //edge case 2. - milo
         if (!LoaderFunction)
         {
-            printf("[Events] Failed to find loader func: %ls\n", Event.LoaderFuncPath);
+            EventLog("[Events] Failed to find loader func: %ls", Event.LoaderFuncPath);
             return;
         }
         //yay! - milo
-        printf("[Events] Loading event level: %ls\n", Event.LoaderFuncPath);
+        EventLog("[Events] Loading event level: %ls", Event.LoaderFuncPath);
         ScriptingObject->Call(const_cast<UFunction*>(LoaderFunction), 0.f);
-        printf("[Events] Event level loaded!!\n");
+        EventLog("[Events] Event level loaded!!");
         return;
     }
-    printf("[Events] Build does not have an event.\n");
+    EventLog("[Events] Build does not have an event.");
 }
 void Events::StartEvent()
 {
@@ -131,11 +159,11 @@ void Events::StartEvent()
 
             if (!LoaderFunction)
             {
-                printf("[Events] failed to find loader func: %ls\n", Event.LoaderFuncPath);
+                EventLog("[Events] failed to find loader func: %ls", Event.LoaderFuncPath);
             }
             else
             {
-                printf("[Events] loading event level: %ls\n", Event.LoaderFuncPath);
+                EventLog("[Events] loading event level: %ls", Event.LoaderFuncPath);
                 ScriptingObject->Call(const_cast<UFunction*>(LoaderFunction), 0.f);
             }
         }
@@ -144,7 +172,7 @@ void Events::StartEvent()
             const UFunction* Function = FindObject<UFunction>(EventFunction.FunctionPath);
             if (!Function)
             {
-                printf("[Events] failed to find func: %ls\n", EventFunction.FunctionPath);
+                EventLog("[Events] failed to find func: %ls", EventFunction.FunctionPath);
                 continue;
             }
 
@@ -168,7 +196,7 @@ void Events::StartEvent()
 
                     /**static auto GamePhaseOffset = GPL->GetOffset("GamePhase");
                     auto& _GamePhase = *(EAthenaGamePhase*)(__int64(GPL) + GamePhaseOffset);
-                    printf("%d\n", _GamePhase);*/
+                    EventLog("%d\n", _GamePhase);*/
                     if (UFortGameStateComponent_BattleRoyaleGamePhaseLogic::StaticClass())
                     {
                         auto GPL = UFortGameStateComponent_BattleRoyaleGamePhaseLogic::Get(GameMode);
@@ -246,7 +274,7 @@ void Events::StartEvent()
         return;
     }
 
-    printf("[Events] Build does not have an event.\n");
+    printf("[Events] Build does not have an event.");
 }
 
 void (*ActivatePhaseOG)(ASpecialEventScript* _this, int IndexToActivate, float a3);

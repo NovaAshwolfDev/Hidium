@@ -23,6 +23,33 @@
 #include "../Public/FortAthenaSpawningPolicyManager.h"
 #include <random>
 
+static void EventLog(const char* Message)
+{
+    FILE* File = nullptr;
+
+    if (fopen_s(&File, "HidiumEvents.log", "a") == 0 && File)
+    {
+        fprintf(File, "%s\n", Message);
+        fclose(File);
+    }
+
+    printf("%s\n", Message);
+}
+
+static void EventLog(const char* Message, const wchar_t* Value)
+{
+    FILE* File = nullptr;
+
+    if (fopen_s(&File, "HidiumEvents.log", "a") == 0 && File)
+    {
+        fprintf(File, "%s", Message);
+        fwprintf(File, L"%ls\n", Value);
+        fclose(File);
+    }
+
+    printf("%s", Message);
+    wprintf(L"%ls\n", Value);
+}
 void ShowFoundation(const ABuildingFoundation* Foundation)
 {
     if (!Foundation)
