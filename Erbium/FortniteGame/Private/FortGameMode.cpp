@@ -610,21 +610,27 @@ void AFortGameMode::ReadyToStartMatch_(UObject* Context, FFrame& Stack, bool* Re
                                 AllScriptingObjects.Free();
                             }
 
+                        //shitty place to put this but hopefully nothing bad happens. - milo.
                         if (Event.LoaderFuncPath != nullptr && ScriptingObject)
-                            if (const UFunction* LoaderFunction = FindObject<UFunction>(Event.LoaderFuncPath))
-                            {
-                                int Param = 1;
-                                ScriptingObject->Call(const_cast<UFunction*>(LoaderFunction), 0.f);
-                                printf("[Events] Loaded event level!\n");
-                            }
-                            else
-                                printf("[Events] Failed to load event level!\n");
+                        {
+                                if (const UFunction* LoaderFunction = FindObject<UFunction>(Event.LoaderFuncPath))
+                                {
+                                    ScriptingObject->Call(const_cast<UFunction*>(LoaderFunction), 0.f);
+                                    printf("[Events] Loaded event level!\n");
+                                }
+                                if (VersionInfo.FortniteVersion = 10.40)
+                                {
+                                    printf("[Events] NightNight event is prepared!\n");
+                                }
+                                else
+                                    printf("[Events] Failed to load event level!\n");
 
-                        if (GameMode->HasSafeZoneLocations())
-                            GameMode->SafeZoneLocations.Free();
-                        else
-                            UFortGameStateComponent_BattleRoyaleGamePhaseLogic::bEnableZones = false;
-                        break;
+                            if (GameMode->HasSafeZoneLocations())
+                                GameMode->SafeZoneLocations.Free();
+                            else
+                                UFortGameStateComponent_BattleRoyaleGamePhaseLogic::bEnableZones = false;
+                            break;
+                        }
                     }
 
                     break;
