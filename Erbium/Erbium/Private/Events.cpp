@@ -43,6 +43,53 @@ public:
     DEFINE_FUNC(OnRep_RootStartTime, void);
 };
 
+//funny load event fucntion goes here!
+//partially copied from the original but butchered to work with loading instead. - milo
+void Events::LoadEvent() 
+{
+    if (VersionInfo.FortniteVersion < 4.4)
+        return; // no other events from what i know of?
+    
+    auto GameMode = (AFortGameMode*)UWorld::GetWorld()->AuthorityGameMode;
+
+    for (auto& Event : EventsArray) 
+    {
+        if (Event.EventVersion != VersionInfo.FortniteVersion)
+            continue;
+
+        UObject* LoaderObject = nullptr;
+        if (Event.ScriptingClass) {
+            if (const UClass* ScriptingClass = FindObject<UClass>(Event.ScriptingClass))
+            {
+                TArray<AActor*> AllScriptingObjects;
+                Utils::GetAll(ScriptingClass, AllScriptingObjects);
+                ScriptingObject = AllScriptingObjects.Num() > 0 ? AllScriptingObjects[0] : nullptr;
+            }
+        }
+
+        //edge case 1. - milo
+        if(!ScriptingObject)
+        {
+            printf("[Events] Failed to find ScriptingObject for loader!\n");
+            return;
+        }
+        
+        const UFunction* LoaderFunction = FindObject<UFunction>(Event.LoaderFuncPath);
+
+        //edge case 2. - milo
+        if (!LoaderFunction)
+        {
+            printf("[Events] Failed to find loader func: %ls\n", Event.LoaderFuncPath);
+            return;
+        }
+        //yay! - milo
+        printf("[Events] Loading event level: %ls\n", Event.LoaderFuncPath);
+        ScriptingObject->Call(const_cast<UFunction*>(LoaderFunction), 0.f);
+        printf("[Events] Event level loaded!!\n");
+        return;
+    }
+    printf("[Events] Build does not have an event.\n");
+}
 void Events::StartEvent()
 {
     if (VersionInfo.FortniteVersion < 4.4)
