@@ -99,6 +99,8 @@ public:
     static inline std::vector<FEvent> EventsArray = {};
 #endif
     static void StartEvent();
+    //how did we forget this. is this not like. the core of fcking everything???
+    static void LoadEvent();
 
     InitHooks;
 };
