@@ -77,7 +77,21 @@ void Events::StartEvent()
                 ScriptingObject = AllLoaders.Num() > 0 ? AllLoaders[0] : nullptr;
                 // AllLoaders.Free();
             }
+        //i think this should work? if not kill me later. - milo
+        if (Event.LoaderFuncPath && ScriptingObject)
+        {
+            const UFunction* LoaderFunction = FindObject<UFunction>(Event.LoaderFuncPath);
 
+            if (!LoaderFunction)
+            {
+                printf("[Events] failed to find loader func: %ls\n", Event.LoaderFuncPath);
+            }
+            else
+            {
+                printf("[Events] loading event level: %ls\n", Event.LoaderFuncPath);
+                ScriptingObject->Call(const_cast<UFunction*>(LoaderFunction), 0.f);
+            }
+        }
         for (auto& EventFunction : Event.EventFunctions)
         {
             const UFunction* Function = FindObject<UFunction>(EventFunction.FunctionPath);
