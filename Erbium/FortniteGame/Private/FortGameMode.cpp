@@ -598,21 +598,23 @@ void AFortGameMode::ReadyToStartMatch_(UObject* Context, FFrame& Stack, bool* Re
                         if (Event.EventVersion != VersionInfo.FortniteVersion)
                             continue;
 
-                        UObject* LoaderObject = nullptr;
-                        if (Event.LoaderClass)
-                            if (const UClass* LoaderClass = FindObject<UClass>(Event.LoaderClass))
+                        //hi i had to rework this... 
+                        //TODO: version check instead.
+                        UObject* ScriptingObject = nullptr;
+                        if (Event.ScriptingClass)
+                            if (const UClass* ScriptingClass = FindObject<UClass>(Event.ScriptingClass))
                             {
-                                TArray<AActor*> AllLoaders;
-                                Utils::GetAll(LoaderClass, AllLoaders);
-                                LoaderObject = AllLoaders.Num() > 0 ? AllLoaders[0] : nullptr;
-                                AllLoaders.Free();
+                                TArray<AActor*> AllScriptingObjects;
+                                Utils::GetAll(ScriptingClass, AllScriptingObjects);
+                                ScriptingObject = AllScriptingObjects.Num() > 0 ? AllScriptingObjects[0] : nullptr;
+                                AllScriptingObjects.Free();
                             }
 
-                        if (Event.LoaderFuncPath != nullptr && LoaderObject)
+                        if (Event.LoaderFuncPath != nullptr && ScriptingObject)
                             if (const UFunction* LoaderFunction = FindObject<UFunction>(Event.LoaderFuncPath))
                             {
                                 int Param = 1;
-                                LoaderObject->ProcessEvent(const_cast<UFunction*>(LoaderFunction), &Param);
+                                ScriptingObject->Call(const_cast<UFunction*>(LoaderFunction), 0.f);
                                 printf("[Events] Loaded event level!\n");
                             }
                             else
