@@ -57,7 +57,7 @@ void Events::LoadEvent()
         if (Event.EventVersion != VersionInfo.FortniteVersion)
             continue;
 
-        UObject* LoaderObject = nullptr;
+        UObject* ScriptingObject = nullptr;
         if (Event.ScriptingClass) {
             if (const UClass* ScriptingClass = FindObject<UClass>(Event.ScriptingClass))
             {
